@@ -231,7 +231,8 @@ class DCNPooling(DCNv2Pooling):
                  part_size=None,
                  sample_per_part=4,
                  trans_std=.0,
-                 deform_fc_dim=1024):
+                 deform_fc_dim=1024,
+                 activation_func=nn.ReLU(inplace=True),):
         super(DCNPooling, self).__init__(spatial_scale,
                                          pooled_size,
                                          output_dim,
@@ -242,14 +243,15 @@ class DCNPooling(DCNv2Pooling):
                                          trans_std)
 
         self.deform_fc_dim = deform_fc_dim
+        self.acf = activation_func
 
         if not no_trans:
             self.offset_mask_fc = nn.Sequential(
                 nn.Linear(self.pooled_size * self.pooled_size *
                           self.output_dim, self.deform_fc_dim),
-                nn.ReLU(inplace=True),
+                self.acf,
                 nn.Linear(self.deform_fc_dim, self.deform_fc_dim),
-                nn.ReLU(inplace=True),
+                self.acf,
                 nn.Linear(self.deform_fc_dim, self.pooled_size *
                           self.pooled_size * 3)
             )

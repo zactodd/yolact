@@ -160,7 +160,8 @@ class SavePath:
 
         return max_name
 
-def make_net(in_channels, conf, include_last_relu=True):
+
+def make_net(in_channels, conf, include_last_acf=True, activation_func=nn.ReLU(inplace=True)):
     """
     A helper function to take a config setting and turn it into a network.
     Used by protonet and extrahead. Returns (network, out_channels)
@@ -203,11 +204,11 @@ def make_net(in_channels, conf, include_last_relu=True):
         # if num_channels is None:
         #     return [layer]
         # else:
-        return [layer, nn.ReLU(inplace=True)]
+        return [layer, activation_func]
 
     # Use sum to concat together all the component layer lists
     net = sum([make_layer(x) for x in conf], [])
-    if not include_last_relu:
+    if not include_last_acf:
         net = net[:-1]
 
     return nn.Sequential(*(net)), in_channels
